@@ -1,31 +1,35 @@
-Sygnalizacja Świetlna na Arduino
-Projekt dwukierunkowej sygnalizacji świetlnej (lub sygnalizacji dla dwóch kierunków ruchu/pieszych) zrealizowany przy użyciu płytki Arduino. Program steruje czterema diodami LED reprezentującymi światła czerwone oraz zielone dla dwóch niezależnych torów.
-📋 Opis Działania
-Program realizuje cykl świetlny o łącznym czasie trwania 12 sekund, podzielony na 4 fazy:
-0 – 4 s (Faza 1): Światło czerwone i zielone dla pierwszego kierunku (Pin 9 i Pin 10). Drugi kierunek wyłączony.
-4 – 6 s (Faza 2 - Przejściowa): Światła czerwone dla obu kierunków (Pin 9 oraz Pin 11) – zapewnienie bezpiecznego czyszczenia skrzyżowania.
-6 – 10 s (Faza 3): Światło czerwone i zielone dla drugiego kierunku (Pin 11 i Pin 12). Pierwszy kierunek wyłączony.
-10 – 12 s (Faza 4 - Przejściowa): Ponowne światła czerwone dla obu kierunków (Pin 9 oraz Pin 11).
-Po upływie 12 sekund cykl powtarza się automatycznie dzięki zastosowaniu operacji modulo (millis() % 12000).
-🛠️ Schemat Podłączenia (Hardware)
-Wymagane Elementy:
-1x Arduino (np. Uno, Nano, Mega)
-4x Dioda LED (2x Czerwona, 2x Zielona)
-4x Rezystor (np. 220Ω lub 330Ω)
-Płytka stykowa i przewody połączeniowe
-Przypisanie Pinów:
-Element
-Pin Arduino
-Opis
-Dioda LED 1
-Pin 9
-Czerwone (Kierunek 1)
-Dioda LED 2
-Pin 10
-Zielone (Kierunek 1)
-Dioda LED 3
-Pin 11
-Czerwone (Kierunek 2)
-Dioda LED 4
-Pin 12
-Zielone (Kierunek 2)
+
+🛠️ Mapowanie Pinów i Kierunków
+
+Kolejność obsługi kierunków w programie:
+0 = GÓRNY, 1 = PRAWY (Zablokowany), 2 = DOLNY, 3 = LEWY
+
+Diody LED (Wyjścia)
+
+
+Kierunek	Indeks	Pin LED Czerwona	Pin LED Zielona	Status działania
+GÓRNY	0	9	8	🟢 Sprawny
+PRAWY	1	7	6	🔴 Odcięty programowo
+DOLNY	2	5	2	🟢 Sprawny
+LEWY	3	3	4	🟢 Sprawny
+
+
+Czujniki Ruchu (Wejścia)
+
+Wszystkie piny wejściowe pracują w trybie INPUT_PULLUP.
+• Pin 12: Czujnik Górny
+• Pin 10: Czujnik Dolny
+• Pin 13: Czujnik Lewy (Dodatkowo zabezpieczony warunkiem zależności od pinu 12)
+• Pin 11: Wolny / Nieaktywny (przypisany sprzętowo do uszkodzonego kierunku prawego)
+
+⚙️ Algorytm i Logika Działania
+
+1. Detekcja zbocza narastającego: Pojazdy są dodawane do kolejki tylko w momencie wykrycia nowego ruchu (ruch[i] && !poprzedniRuch[i]). Zapobiega to ciągłemu dodawaniu tego samego pojazdu do ogonka.
+2. Kolejkowanie FIFO: Auta ze sprawnych kierunków ustawiają się w cyklicznym buforze. Zielone światło otrzymuje zawsze ten kierunek, który zgłosił się jako pierwszy.
+3. Czas podtrzymania (5000 ms): Po opuszczeniu czujnika przez pojazd, zielone światło świeci się jeszcze przez 5 sekund (czasPodtrzymania). Jeśli w tym czasie pojawi się kolejny pojazd na tym samym kierunku, licznik czasu resetuje się, umożliwiając płynny przejazd kolumny samochodów.
+
+🚀 Instrukcja Wdrożenia
+
+1. Podłącz diody LED oraz przyciski/czujniki do płytki Arduino zgodnie z powyższą tabelą mapowania pinów.
+2. Upewnij się, że przyciski/czujniki zwierają pin wejściowy do masy (GND) w momencie wykrycia pojazdu (stan LOW w spoczynku, stan HIGH przy detekcji – zgodnie z logiką kodu).
+3. Wgraj program na płytkę za pomocą Arduino IDE.
