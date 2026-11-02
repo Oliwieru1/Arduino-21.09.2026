@@ -1,31 +1,69 @@
-Sygnalizacja Świetlna na Arduino
-Projekt dwukierunkowej sygnalizacji świetlnej (lub sygnalizacji dla dwóch kierunków ruchu/pieszych) zrealizowany przy użyciu płytki Arduino. Program steruje czterema diodami LED reprezentującymi światła czerwone oraz zielone dla dwóch niezależnych torów.
-📋 Opis Działania
-Program realizuje cykl świetlny o łącznym czasie trwania 12 sekund, podzielony na 4 fazy:
-0 – 4 s (Faza 1): Światło czerwone i zielone dla pierwszego kierunku (Pin 9 i Pin 10). Drugi kierunek wyłączony.
-4 – 6 s (Faza 2 - Przejściowa): Światła czerwone dla obu kierunków (Pin 9 oraz Pin 11) – zapewnienie bezpiecznego czyszczenia skrzyżowania.
-6 – 10 s (Faza 3): Światło czerwone i zielone dla drugiego kierunku (Pin 11 i Pin 12). Pierwszy kierunek wyłączony.
-10 – 12 s (Faza 4 - Przejściowa): Ponowne światła czerwone dla obu kierunków (Pin 9 oraz Pin 11).
-Po upływie 12 sekund cykl powtarza się automatycznie dzięki zastosowaniu operacji modulo (millis() % 12000).
-🛠️ Schemat Podłączenia (Hardware)
-Wymagane Elementy:
-1x Arduino (np. Uno, Nano, Mega)
-4x Dioda LED (2x Czerwona, 2x Zielona)
-4x Rezystor (np. 220Ω lub 330Ω)
-Płytka stykowa i przewody połączeniowe
-Przypisanie Pinów:
-Element
-Pin Arduino
-Opis
-Dioda LED 1
-Pin 9
-Czerwone (Kierunek 1)
-Dioda LED 2
-Pin 10
-Zielone (Kierunek 1)
-Dioda LED 3
-Pin 11
-Czerwone (Kierunek 2)
-Dioda LED 4
-Pin 12
-Zielone (Kierunek 2)
+🌯 ROLLO KEBAB – NA ZAMKOWEJ!
+📟 Opis projektu
+
+Projekt wykorzystuje wyświetlacz LCD 16x2 sterowany za pomocą biblioteki Adafruit_LiquidCrystal.
+
+Urządzenie wyświetla serię humorystycznych haseł promujących ROLLO KEBAB. Komunikaty zmieniają się automatycznie co 3,5 sekundy, tworząc niepowtarzalny klimat TRUE ADAM VIBE!
+
+🛠️ Wykorzystane komponenty
+Arduino
+Wyświetlacz LCD 16x2
+Biblioteka Adafruit_LiquidCrystal
+Przewody połączeniowe
+📚 Wykorzystane technologie
+C++ (Arduino)
+Arduino IDE
+Biblioteka Adafruit LiquidCrystal
+⚙️ Jak działa projekt?
+Arduino inicjalizuje wyświetlacz LCD 16x2.
+Włącza podświetlenie ekranu.
+Wywołuje funkcję pokaz(), która wyświetla dwa wiersze tekstu.
+Każdy komunikat pozostaje na ekranie przez 3500 ms.
+Po wyświetleniu wszystkich haseł cykl rozpoczyna się od początku.
+💻 Funkcja pokaz()
+cpp
+void pokaz(String gora, String dol)
+{
+  lcd_1.clear();
+  lcd_1.setCursor(0, 0);
+  lcd_1.print(gora);
+  lcd_1.setCursor(0, 1);
+  lcd_1.print(dol);
+  delay(3500);
+}
+
+
+Funkcja odpowiada za:
+
+Czyszczenie wyświetlacza.
+Ustawienie kursora w pierwszym wierszu.
+Wyświetlenie górnego tekstu.
+Ustawienie kursora w drugim wierszu.
+Wyświetlenie dolnego tekstu.
+Odczekanie 3,5 sekundy.
+🔥 Wyświetlane hasła
+ROLLO KEBAB – NA ZAMKOWEJ!
+ROLLO = TRUE – ADAM!
+INNE KEBABY – TO SUB3!
+ROLLO MA MOC – INNI NIE MAJA!
+TRUE ADAM VIBE – TYLKO W ROLLO!
+INNE KEBABY? – TOTALNE SUB3!
+ROLLO KEBAB – ABSOLUTNY TOP!
+NIE BADZ SUB3 – WYBIERZ ROLLO!
+ROLLO = GOAT – ZAMKOWA!
+🚀 Uruchomienie projektu
+Otwórz projekt w Arduino IDE.
+Zainstaluj bibliotekę Adafruit_LiquidCrystal.
+Podłącz wyświetlacz LCD.
+Wybierz odpowiednią płytkę Arduino i port COM.
+Wgraj program na płytkę.
+Obserwuj, jak ROLLO przejmuje wyświetlacz!
+🏆 Podsumowanie
+
+To nie jest zwykły wyświetlacz LCD.
+
+To oficjalny system propagandy ROLLO KEBAB.
+
+ROLLO = TRUE. INNE KEBABY = SUB3.
+
+🌯 NA ZAMKOWEJ ROLLO MA MOC!
