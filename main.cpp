@@ -1,57 +1,41 @@
-int diody[] = {9, 10, 11, 12};
 
-unsigned long zapCzas = 0;
+#include <Adafruit_LiquidCrystal.h>
+
+Adafruit_LiquidCrystal lcd_1(0);
+
+void pokaz(String gora, String dol)
+{
+  lcd_1.clear();
+  lcd_1.setCursor(0, 0);
+  lcd_1.print(gora);
+  lcd_1.setCursor(0, 1);
+  lcd_1.print(dol);
+  delay(3500);
+}
 
 void setup()
 {
-  for (int i = 0; i < 4; i++) {
-    pinMode(diody[i], OUTPUT);
-  }
+  lcd_1.begin(16, 2);
+  lcd_1.setBacklight(1);
 }
 
 void loop()
 {
-  unsigned long czas = millis();
-  unsigned long etap = czas - zapCzas;
+  pokaz("ROLLO KEBAB", "NA ZAMKOWEJ!");
 
-  // 0-4 sekundy
-  // 9 = czerwone, 10 = zielone
-  if (etap < 4000) {
-    digitalWrite(9, HIGH);
-    digitalWrite(10, HIGH);
-    digitalWrite(11, LOW);
-    digitalWrite(12, LOW);
-  }
+  pokaz("ROLLO = TRUE", "ADAM!");
 
-  // 4-6 sekund
-  // Dwie czerwone
-  else if (etap < 6000) {
-    digitalWrite(9, HIGH);
-    digitalWrite(10, LOW);
-    digitalWrite(11, HIGH);
-    digitalWrite(12, LOW);
-  }
+  pokaz("INNE KEBABY", "TO SUB3!");
 
-  // 6-10 sekund
-  // 11 = czerwone, 12 = zielone
-  else if (etap < 10000) {
-    digitalWrite(9, LOW);
-    digitalWrite(10, LOW);
-    digitalWrite(11, HIGH);
-    digitalWrite(12, HIGH);
-  }
+  pokaz("ROLLO MA MOC", "INNI NIE MAJA!");
 
-  // 10-12 sekund
-  // Dwie czerwone
-  else if (etap < 12000) {
-    digitalWrite(9, HIGH);
-    digitalWrite(10, LOW);
-    digitalWrite(11, HIGH);
-    digitalWrite(12, LOW);
-  }
+  pokaz("TRUE ADAM VIBE", "TYLKO W ROLLO!");
 
-  // Od początku
-  else {
-    zapCzas = czas;
-  }
+  pokaz("INNE KEBABY?", "TOTALNE SUB3!");
+
+  pokaz("ROLLO KEBAB", "ABSOLUTNY TOP!");
+
+  pokaz("NIE BADZ SUB3", "WYBIERZ ROLLO!");
+
+  pokaz("ROLLO = GOAT", "ZAMKOWA!");
 }
