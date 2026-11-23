@@ -9,85 +9,138 @@ Servo serwo1, serwo2;
 #define LED 12
 #define PIR_PIN 4
 
-int pozycja1 = 0, pozycja2 = 180;
-int cel1 = 0, cel2 = 180;
-int stan = 0, kierunek = 0;
+// DEFINICJE STANOW
+#define STAN_ZAMKNIETA 0
+#define STAN_OTWARTA 1
+#define STAN_OTWIERANIE 4
+#define STAN_ZAMYKANIE 5
+#define STAN_ZATRZYMANIE 6
+
+int pozycja1 = 0;
+int pozycja2 = 180;
+
+int cel1 = 0;
+int cel2 = 180;
+
+int stan = STAN_ZAMKNIETA;
+int kierunek = STAN_OTWIERANIE;
 
 bool ruch = false;
 
-unsigned long czas = 0, przycisk = 0;
+unsigned long czas = 0;
+unsigned long przycisk = 0;
 
-// STAN 0 - ZAMKNIETA
+// ZAMKNIETA
 void zamknieta() {
   cel1 = 0;
   cel2 = 180;
-  stan = 0;
+  stan = STAN_ZAMKNIETA;
   ruch = false;
 }
 
-// STAN 1 - OTWARTA
+// OTWARTA
 void otwarta() {
   cel1 = 90;
   cel2 = 90;
-  stan = 1;
+  stan = STAN_OTWARTA;
   ruch = false;
 }
 
-// STAN 4 - OTWIERANIE
+// OTWIERANIE
 void otwieranie() {
   cel1 = 90;
   cel2 = 90;
-  stan = 4;
-  kierunek = 4;
+  stan = STAN_OTWIERANIE;
+  kierunek = STAN_OTWIERANIE;
   ruch = true;
 }
 
-// STAN 5 - ZAMYKANIE
+// ZAMYKANIE
 void zamykanie() {
   cel1 = 0;
   cel2 = 180;
-  stan = 5;
-  kierunek = 5;
+  stan = STAN_ZAMYKANIE;
+  kierunek = STAN_ZAMYKANIE;
   ruch = true;
 }
 
-// STAN 6 - UCHYLENIE / ZATRZYMANIE
+// ZATRZYMANIE
 void zatrzymanie() {
-  kierunek = (stan == 4) ? 5 : 4;
+
+  if (stan == STAN_ZAMYKANIE) {
+    kierunek = STAN_OTWIERANIE;
+  }
+  else {
+    kierunek = STAN_ZAMYKANIE;
+  }
 
   cel1 = pozycja1;
   cel2 = pozycja2;
 
   ruch = false;
-  stan = 6;
+  stan = STAN_ZATRZYMANIE;
 }
 
 // OBSLUGA POWER
 void obslugaPower() {
-  if (ruch) {
-    zatrzymanie();
-  }
-  else if (stan == 0) {
-    otwieranie();
-  }
-  else if (stan == 1) {
-    zamykanie();
-  }
-  else if (stan == 6) {
-    if (kierunek == 4) otwieranie();
-    else zamykanie();
+
+  switch (stan) {
+
+    case STAN_ZAMKNIETA:
+      otwieranie();
+      break;
+
+    case STAN_OTWARTA:
+      zamykanie();
+      break;
+
+    case STAN_OTWIERANIE:
+    case STAN_ZAMYKANIE:
+      zatrzymanie();
+      break;
+
+    case STAN_ZATRZYMANIE:
+
+      switch (kierunek) {
+
+        case STAN_OTWIERANIE:
+          otwieranie();
+          break;
+
+        case STAN_ZAMYKANIE:
+          zamykanie();
+          break;
+      }
+      break;
   }
 }
 
 // OBSLUGA PIR
 void obslugaPIR() {
-  if (digitalRead(PIR_PIN) == HIGH && ruch) {
-    zamykanie();
+
+  int czujnik = digitalRead(PIR_PIN);
+
+  switch (stan) {
+
+    case STAN_ZAMYKANIE:
+
+      if (czujnik == HIGH) {
+        Serial.println("RUCH WYKRYTY!");
+        Serial.println("ZAMIANA KIERUNKU NA OTWIERANIE!");
+
+        otwieranie();
+      }
+
+      break;
+
+    default:
+      break;
   }
 }
 
 // STEROWANIE SERWAMI
 void sterowanieSerwami() {
+
   if (!ruch || millis() - czas < 15) return;
 
   czas = millis();
@@ -102,13 +155,25 @@ void sterowanieSerwami() {
   serwo2.write(pozycja2);
 
   if (pozycja1 == cel1 && pozycja2 == cel2) {
-    if (stan == 4) otwarta();
-    else if (stan == 5) zamknieta();
+
+    switch (stan) {
+
+      case STAN_OTWIERANIE:
+        otwarta();
+        Serial.println("BRAMA OTWARTA");
+        break;
+
+      case STAN_ZAMYKANIE:
+        zamknieta();
+        Serial.println("BRAMA ZAMKNIETA");
+        break;
+    }
   }
 }
 
 // ODCZYT PILOTA
 void obslugaPilota() {
+
   if (!IrReceiver.decode()) return;
 
   if (IrReceiver.decodedIRData.command == POWER &&
@@ -122,7 +187,11 @@ void obslugaPilota() {
   IrReceiver.resume();
 }
 
+// SETUP
 void setup() {
+
+  Serial.begin(9600);
+
   serwo1.attach(3);
   serwo2.attach(5);
 
@@ -133,11 +202,17 @@ void setup() {
   serwo2.write(pozycja2);
 
   IrReceiver.begin(IR_PIN, ENABLE_LED_FEEDBACK);
+
+  Serial.println("SYSTEM GOTOWY");
 }
 
+// LOOP
 void loop() {
+
   obslugaPIR();
+
   obslugaPilota();
+
   sterowanieSerwami();
 
   digitalWrite(LED, ruch);
